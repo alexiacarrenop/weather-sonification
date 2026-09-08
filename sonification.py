@@ -97,3 +97,67 @@ for column in df_smooth.columns:
 
     print(df_music.head())
     print("\nShape:", df_music.shape)
+
+# --------------------------------
+# Step 5: Create musical mappings
+# --------------------------------
+
+# D minor pentatonic scale
+scale = ["D3", "F3", "G3", "A3", "C4",
+         "D4", "F4", "G4", "A4", "C5"]
+
+# Temperature (strings)
+# Low temperature = lower notes
+# High temperature # higher notes
+
+#Convert normalised temperature into a note index within the musical scale
+df_music["strings_note"] = (
+    df_music["temperature_norm"] * (len(scale) - 1)
+).round().astype(int)
+
+# Ensure note index stays within range 
+df_music["strings_note"] = df_music["strings_note"].clip(
+    0, len(scale) - 1
+)
+
+# Humidity (analog pad)
+# Low humidity = quiet/thin 
+# High humidity = louder/atmospheric
+
+df_music["pad_volume"] = df_music["humidity_norm"]
+
+# More humidity = more reverb
+df_music["pad_reverb"] = df_music["humidity_norm"]
+
+# Wind (organ)
+# Low wind = longer notes
+# High wind = shorter notes
+
+df_music["organ_duration"] = ( 1.0 - df_music["wind_norm"])
+
+df_music["organ_density"] = df_music["wind_norm"]
+
+# Pressure (bass)
+# Low pressure = deeper bass
+# High pressure = higher bass
+
+bass_scale = ["D2", "F2", "G2", "A2", "C3"]
+
+df_music["bass_note"] = ( df_music["pressure_norm"] * (len(bass_scale) - 1)
+).round().astype(int)
+
+df_music["bass_note"] = ( df_music["bass_note"] * (len(bass_scale) - 1)
+).clip(0, len(bass_scale) -1)
+
+# Rain (soft synth)
+# No rain = silence
+# Light rain = occasional notes
+# Heavy rain = dense notes
+
+df_music["rain_density"] = df_music["rain_norm"]
+
+print(df_music.head())
+
+df_music.to_csv("sonic_pi_weather.csv", index=False)
+
+print("Exported musical events to sonic_pi_weather.csv")
