@@ -72,7 +72,7 @@ df["pressure_midi"] = pressure_scale[
 ]
 
 df["rain_hits"] = (
-    df["rain_norm"] * 8
+    df["rain_norm"] * 4
 ).round().astype(int)
 
 df.to_csv("ncl_weather_mapped.csv", index=False)
