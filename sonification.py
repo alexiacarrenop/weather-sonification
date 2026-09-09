@@ -146,8 +146,7 @@ bass_scale = ["D2", "F2", "G2", "A2", "C3"]
 df_music["bass_note"] = ( df_music["pressure_norm"] * (len(bass_scale) - 1)
 ).round().astype(int)
 
-df_music["bass_note"] = ( df_music["bass_note"] * (len(bass_scale) - 1)
-).clip(0, len(bass_scale) -1)
+df_music["bass_note"] = df_music["bass_note"].clip(0, len(bass_scale) -1)
 
 # Rain (soft synth)
 # No rain = silence
@@ -158,6 +157,10 @@ df_music["rain_density"] = df_music["rain_norm"]
 
 print(df_music.head())
 
-df_music.to_csv("sonic_pi_weather.csv", index=False)
+# df_music.to_csv("sonic_pi_weather.csv", index=False)
 
-print("Exported musical events to sonic_pi_weather.csv")
+# print("Exported musical events to sonic_pi_weather.csv")
+
+# Expert temperature notes for Sonic Pi
+with open("rain_values.txt", "w") as file:
+    file.write(str(df_music["rain_norm"].tolist()))
