@@ -1,4 +1,6 @@
 import sys
+import pandas as pd
+import numpy as np
 from get_weather import get_weather
 from clean_weather_file import clean_weather_file
 from weather_mapping import weather_mapping

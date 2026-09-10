@@ -1,25 +1,27 @@
 from datetime import datetime 
 import meteostat as ms
 
-print("Meteostat works!")
+def get_weather():
 
-# Newcastle
-station = ms.Station(id="03245")
+    print("Meteostat works!")
 
-# Time frame
-start = datetime(2025, 9, 29)
-end = datetime(2026, 6, 15, 23, 59)
+    # Newcastle
+    station = ms.Station(id="03245")
 
-# Get hourly weather 
-data = ms.hourly(
-    station,
-    start,
-    end,
-    timezone="Europe/London"
-)
+    # Time frame
+    start = datetime(2025, 9, 29)
+    end = datetime(2026, 6, 15, 23, 59)
 
-df = data.fetch()
+    # Get hourly weather 
+    data = ms.hourly(
+        station,
+        start,
+        end,
+        timezone="Europe/London"
+    )
 
-print(df)
+    df = data.fetch()
 
-df.to_csv("ncl_weather.csv")
+    print(df)
+
+    df.to_csv("ncl_weather.csv")
