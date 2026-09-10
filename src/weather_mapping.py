@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-
-
+from config import TARGET_MINUTES, BPM
 
 df = pd.read_csv("ncl_weather_clean.csv", parse_dates=["datetime"])
 
@@ -13,6 +12,9 @@ ranges = {
     "pressure": (970, 1045)
 }
 
+# ----------------------------------------------------------------------------
+# Step 1: Normalise data
+# ----------------------------------------------------------------------------
 def normalise(series, low, high):
     norm = (series - low) / (high - low)
     return norm.clip(0, 1) # clip in case data exceeds chosen range
@@ -74,5 +76,42 @@ df["pressure_midi"] = pressure_scale[
 df["rain_hits"] = (
     df["rain_norm"] * 4
 ).round().astype(int)
+
+# ----------------------------------------------------------------------------
+# Step 2: Compress data
+#
+#  Hourly data get averaged, which
+# compresses time and smooths noise.
+# ----------------------------------------------------------------------------
+
+required_cols = [
+    "temperature_midi", "humidity_midi", "wind_midi", "wind_norm",
+    "pressure_midi", "rain_hits"
+]
+
+df = df.sort_values("datetime").reset_index(drop=True)
+df = df.dropna(subset=required_cols).reset_index(drop=True)
+
+target_beats = round(TARGET_MINUTES * BPM)
+bucket_size = max(1, len(df) // target_beats)
+
+print(f"{len(df)} hourly rows -> bucketing every {bucket_size} hours "
+      f"-> ~{len(df) // bucket_size} notes -> "
+      f"~{(len(df) // bucket_size) / BPM:.1f} min at {BPM} BPM")
+
+df["bucket"] = np.arange(len(df)) // bucket_size
+
+df = (
+    df.groupby("bucket")
+    .agg({
+        "temperature_midi": "mean",
+        "humidity_midi": "mean",
+        "wind_midi": "mean",
+        "wind_norm": "max",     
+        "pressure_midi": "mean",
+        "rain_hits": "sum",    
+    })
+    .reset_index(drop=True)
+)
 
 df.to_csv("ncl_weather_mapped.csv", index=False)
