@@ -4,7 +4,7 @@ import numpy as np
 from datetime import datetime 
 from WeatherFetcher import WeatherFetcher
 from WeatherCleaner import WeatherCleaner
-from weather_mapping import weather_mapping
+from WeatherMapper import WeatherMapper
 from create_midi import create_midi
 
 def main():
@@ -17,6 +17,9 @@ def main():
 
     cleaner = WeatherCleaner(df)
     cleaned_df = cleaner.clean()
+
+    mapper = WeatherMapper(cleaned_df)
+    mapped_df = mapper.map()
     
     
     # clean_weather_file()
