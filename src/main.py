@@ -5,7 +5,7 @@ from datetime import datetime
 from WeatherFetcher import WeatherFetcher
 from WeatherCleaner import WeatherCleaner
 from WeatherMapper import WeatherMapper
-from create_midi import create_midi
+from SonificationEngine import SonificationEngine
 
 def main():
     fetcher = WeatherFetcher(
@@ -13,6 +13,7 @@ def main():
         start=datetime(2025, 9, 29),
         end=datetime(2026, 6, 15, 23, 59)
     )
+
     df = fetcher.fetch()
 
     cleaner = WeatherCleaner(df)
@@ -20,7 +21,11 @@ def main():
 
     mapper = WeatherMapper(cleaned_df)
     mapped_df = mapper.map()
-    
+
+    engine = SonificationEngine(mapped_df)
+    midi = engine.generate()
+
+    midi.save("newcastle_weather.mid")
     
     # clean_weather_file()
     # weather_mapping()
