@@ -41,11 +41,19 @@ class SonificationEngine:
     def generate(self):
 
         df = self.dataframe
+
+        missing_cols = [col for col in required_cols if col not in df.columns]
+
+        if missing_cols:
+            raise ValueError(f"Missing required columns: {', '.join(missing_cols)}")
     
         required_cols = [
                     "temperature_midi", "humidity_midi", "wind_midi", "wind_norm",
                     "pressure_midi", "rain_hits"
                 ]
+
+        if df.empty:
+            raise ValueError("Cannot generate MIDI from an empty dataframe")
     
                 # ----------------------------------------------------------------------------
                 # Step 1: Scale quantization helpers
