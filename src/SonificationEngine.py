@@ -1,4 +1,11 @@
-from config import BPM, ROOT, PENTATONIC, HOUR
+from config import (
+    BPM,
+    ROOT,
+    PENTATONIC,
+    TICKS_PER_BEAT,
+    TICKS_PER_ROW,
+    WIND_OCTAVE_SHIFT,
+)
 from mido import MidiFile, MidiTrack, Message, MetaMessage, bpm2tempo
 
 class SonificationEngine:
@@ -42,15 +49,15 @@ class SonificationEngine:
 
         df = self.dataframe
 
+        required_cols = [
+                            "temperature_midi", "humidity_midi", "wind_midi", "wind_norm",
+                            "pressure_midi", "rain_hits"
+                        ]
+
         missing_cols = [col for col in required_cols if col not in df.columns]
 
         if missing_cols:
             raise ValueError(f"Missing required columns: {', '.join(missing_cols)}")
-    
-        required_cols = [
-                    "temperature_midi", "humidity_midi", "wind_midi", "wind_norm",
-                    "pressure_midi", "rain_hits"
-                ]
 
         if df.empty:
             raise ValueError("Cannot generate MIDI from an empty dataframe")
@@ -64,7 +71,7 @@ class SonificationEngine:
                 # ----------------------------------------------------------------------------
                 # Step 2: Build MIDI
                 # ----------------------------------------------------------------------------
-        mid = MidiFile(ticks_per_beat=480)
+        mid = MidiFile(ticks_per_beat=TICKS_PER_BEAT)
 
                 # Temperature (piano) 
         temperature_track = MidiTrack()
@@ -76,7 +83,7 @@ class SonificationEngine:
         for note in df["temperature_midi"]:
             note = self.snap_to_scale(note)
             temperature_track.append(Message("note_on", note=note, velocity=80, time=0))
-            temperature_track.append(Message("note_off", note=note, velocity=0, time=HOUR))
+            temperature_track.append(Message("note_off", note=note, velocity=0, time=TICKS_PER_ROW))
 
                 # Humidity (Slow strings) 
         humidity_track = MidiTrack()
@@ -96,12 +103,12 @@ class SonificationEngine:
             for i, note in enumerate(chord):
                 humidity_track.append(
                             Message("note_off", channel=1, note=note, velocity=0,
-                                    time=HOUR if i == 0 else 0)
+                                    time=TICKS_PER_ROW if i == 0 else 0)
                         )
 
                 # Wind (flute, shifted up 2 octaves into a real flute register and away
                 #     from Pressure's range) 
-        WIND_OCTAVE_SHIFT = 24
+        
 
         wind_track = MidiTrack()
         mid.tracks.append(wind_track)
@@ -112,7 +119,7 @@ class SonificationEngine:
             note = self.snap_to_scale(row["wind_midi"] + WIND_OCTAVE_SHIFT)
             velocity = self.clamp(30 + row["wind_norm"] * 90)
             wind_track.append(Message("note_on", channel=2, note=note, velocity=velocity, time=0))
-            wind_track.append(Message("note_off", channel=2, note=note, velocity=0, time=HOUR))
+            wind_track.append(Message("note_off", channel=2, note=note, velocity=0, time=TICKS_PER_ROW))
 
                 # Pressure (cello) 
         pressure_track = MidiTrack()
@@ -124,7 +131,7 @@ class SonificationEngine:
             note = self.snap_to_scale(note)
             velocity = self.clamp(70 + (i % 5) - 2)  # small variation so it's not a dead-flat drone
             pressure_track.append(Message("note_on", channel=3, note=note, velocity=velocity, time=0))
-            pressure_track.append(Message("note_off", channel=3, note=note, velocity=0, time=HOUR))
+            pressure_track.append(Message("note_off", channel=3, note=note, velocity=0, time=TICKS_PER_ROW))
 
                 # Rain (vibraphone) 
         RAIN_NOTE = self.snap_to_scale(42)
@@ -139,12 +146,12 @@ class SonificationEngine:
             hits = int(hits)
 
             if hits == 0:
-                pending_time += HOUR
+                pending_time += TICKS_PER_ROW
                 continue
 
-            spacing = HOUR // hits
+            spacing = TICKS_PER_ROW // hits
             note_dur = min(60, spacing)
-            leftover = HOUR - (note_dur + spacing * (hits - 1))
+            leftover = TICKS_PER_ROW - (note_dur + spacing * (hits - 1))
 
             for i in range(hits):
                 on_time = pending_time if i == 0 else (spacing - note_dur)
