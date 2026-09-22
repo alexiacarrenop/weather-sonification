@@ -1,4 +1,4 @@
-# Weather Sonification
+ # Weather Sonification
 
 A Python project that transforms hourly weather data into a musical composition.
 

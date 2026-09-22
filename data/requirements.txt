@@ -2,3 +2,4 @@ meteostat
 pandas
 numpy
 mido
+pytest

@@ -2,10 +2,10 @@ import sys
 import pandas as pd
 import numpy as np
 from datetime import datetime 
-from WeatherFetcher import WeatherFetcher
-from WeatherCleaner import WeatherCleaner
-from WeatherMapper import WeatherMapper
-from SonificationEngine import SonificationEngine
+from get_weather import WeatherFetcher
+from clean_weather import WeatherCleaner
+from weather_mapping import WeatherMapper
+from sonification import SonificationEngine
 
 def main():
     fetcher = WeatherFetcher(

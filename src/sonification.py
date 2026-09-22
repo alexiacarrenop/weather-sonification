@@ -1,4 +1,4 @@
-from config import (
+from .config import (
     BPM,
     ROOT,
     PENTATONIC,
@@ -8,6 +8,7 @@ from config import (
 )
 from mido import MidiFile, MidiTrack, Message, MetaMessage, bpm2tempo
 
+# Takes mapped weather data and turns it into MIDI composition
 class SonificationEngine:
 
     def __init__(self, dataframe):
@@ -16,9 +17,11 @@ class SonificationEngine:
         self.root = ROOT
         self.scale = PENTATONIC
 
+    # Keeps MIDI values within valid range
     def clamp(self, value, low=0, high=127):
         return max(low, min(high, int(value)))
 
+    # Takes a MIDI note and moves it to the nearest note in scale
     def snap_to_scale(self, note):
         note = self.clamp(note)
 
@@ -45,6 +48,8 @@ class SonificationEngine:
         oct_shift, new_idx = divmod(new_idx, len(self.scale))
         return self.clamp(self.root + (octave + oct_shift) * 12 + self.scale[new_idx])
 
+
+    # Main function that creates the MIDI
     def generate(self):
 
         df = self.dataframe
