@@ -2,11 +2,6 @@ import logging
 import pandas as pd
 import numpy as np
 
-'''
-WeatherCleaner
-    ├── dataframe
-    └── clean()
-'''
 
 class WeatherCleaner: 
     logger = logging.getLogger(__name__)
@@ -17,8 +12,6 @@ class WeatherCleaner:
     def clean(self):
         self.logger.info("Starting weather data cleaning")
         df = self.dataframe
-        
-        # df.index = pd.to_datetime(df.index, utc=True).tz_convert("Europe/London").tz_localize(None)
 
         # Select only variables needed
         df = df[["temp", "prcp", "wspd", "rhum", "pres"]].copy()

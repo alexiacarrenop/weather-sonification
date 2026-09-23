@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 import numpy as np
-from .config import TARGET_MINUTES, BPM
+# from .config import TARGET_MINUTES, BPM
 
 #Class takes cleaned weather data and converts it into musical values
 class WeatherMapper():
@@ -9,8 +9,8 @@ class WeatherMapper():
 
     def __init__ (self, dataframe):
         self.dataframe = dataframe
-        self.target_minutes = TARGET_MINUTES
-        self.bpm = BPM
+        # self.target_minutes = TARGET_MINUTES
+        # self.bpm = BPM
 
     # Map weather into music    
     def map(self):
@@ -26,11 +26,11 @@ class WeatherMapper():
             "pressure": (970, 1045)
         }
 
-        # ----------------------------------------------------------------------------
-        # Step 1: Normalise data
-        # ----------------------------------------------------------------------------
+        # ----------------------------------------------------------------------------------------------------
+        # Step 1: Normalise data: convert each weather value into a 0-1 scale to map units to musical values
+        # ----------------------------------------------------------------------------------------------------
         def normalise(series, low, high):
-            # Conver values into a 0-1 range
+            # Convert values into a 0-1 range
             norm = (series - low) / (high - low)
             return norm.clip(0, 1) # clip in case data exceeds chosen range
 
@@ -51,7 +51,7 @@ class WeatherMapper():
 
 
         # Musical scale using MIDI note number
-        temperature_scale = np.array([60, 62, 64, 65, 67, 69, 71, 72])
+        temperature_scale = np.array([60, 62, 64, 67, 69, 72, 74, 76]) # C4–E5, wide range for melodic movement
         # Convert normalised temperature into a note index (a value between 0-1 to an index from 0-7)
         df["temperature_note_index"] = (
             df["temperature_norm"] * (len(temperature_scale) - 1)
@@ -61,7 +61,7 @@ class WeatherMapper():
             df["temperature_note_index"]
         ]
 
-        humidity_scale = np.array([48, 50, 52, 53, 55, 57, 59, 60])
+        humidity_scale = np.array([48, 50, 52, 55, 57, 60, 62, 64]) # C3–E4
         df["humidity_note_index"] = (
             df["humidity_norm"] * (len(humidity_scale) - 1)
         ).round().astype(int)
@@ -69,7 +69,7 @@ class WeatherMapper():
             df["humidity_note_index"]
         ]
 
-        wind_scale = np.array([36, 38, 40, 43, 45, 47, 50, 52])
+        wind_scale = np.array([43, 45, 48, 50, 52, 55, 57, 60]) # G2–C4
         df["wind_note_index"] = (
             df["wind_norm"] * (len(wind_scale) - 1)
         ).round().astype(int)
@@ -77,7 +77,7 @@ class WeatherMapper():
             df["wind_note_index"]
         ]
 
-        pressure_scale = np.array([36, 38, 40, 43, 45, 47, 50, 52])
+        pressure_scale = np.array([24, 26, 29, 31, 33, 36, 38, 41]) # C1–F2
         df["pressure_note_index"] = (
             df["pressure_norm"] * (len(pressure_scale) - 1)
         ).round().astype(int)
@@ -87,9 +87,10 @@ class WeatherMapper():
 
         # Mapping rain to number of musical hits rather than a musical note
         df["rain_hits"] = (
-            df["rain_norm"] * 2
+            df["rain_norm"] * 4
         ).round().astype(int)
 
+        '''
         # ----------------------------------------------------------------------------
         # Step 2: Compress data
         #
@@ -132,6 +133,7 @@ class WeatherMapper():
             })
             .reset_index(drop=True)
         )
+        '''
 
         # Save final dataframe
         self.dataframe = df
