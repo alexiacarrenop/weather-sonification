@@ -268,3 +268,4 @@ Different variables represent different layers of the composition:
 * **Rain** creates short rhythmic events.
 
 The composition therefore represents changes in weather through changes in pitch, harmony, intensity and rhythm.
+
