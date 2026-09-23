@@ -1,9 +1,11 @@
+import logging
 import pandas as pd
 import numpy as np
 from .config import TARGET_MINUTES, BPM
 
 #Class takes cleaned weather data and converts it into musical values
 class WeatherMapper():
+    logger = logging.getLogger(__name__)
 
     def __init__ (self, dataframe):
         self.dataframe = dataframe
@@ -12,6 +14,7 @@ class WeatherMapper():
 
     # Map weather into music    
     def map(self):
+        self.logger.info("Starting weather-to-music mapping")
         df = self.dataframe 
 
         # Define weather ranges
@@ -41,7 +44,10 @@ class WeatherMapper():
         df["rain_norm"] = normalise(np.sqrt(df["rain"]), 0, np.sqrt(10))
 
         # Print stats for all normalised columns
-        print(df[[c for c in df.columns if c.endswith("_norm")]].describe())
+        self.logger.debug(
+            "Normalised weather statistics:\n%s",
+            df[[c for c in df.columns if c.endswith("_norm")]].describe()
+        )
 
 
         # Musical scale using MIDI note number
@@ -103,10 +109,14 @@ class WeatherMapper():
         bucket_size = max(1, len(df) // target_beats) # calculates bucket size (number of hours that get compressedd) for each musical event
 
         # Print info
-        print(f"{len(df)} hourly rows -> bucketing every {bucket_size} hours "
-            f"-> ~{len(df) // bucket_size} notes -> "
-            f"~{(len(df) // bucket_size) / self.bpm:.1f} min at {self.bpm} BPM")
-
+        self.logger.info(
+            "%d hourly rows -> bucketing every %d hours -> ~%d notes -> ~%.1f min at %d BPM",
+            len(df),
+            bucket_size,
+            len(df) // bucket_size,
+            (len(df) // bucket_size) / self.bpm,
+            self.bpm
+        )
         # Create the buckets
         df["bucket"] = np.arange(len(df)) // bucket_size
         # Group data and calculate average or sum
@@ -125,5 +135,10 @@ class WeatherMapper():
 
         # Save final dataframe
         self.dataframe = df
+
+        self.logger.info(
+            "Weather-to-music mapping complete: %d musical events generated",
+            len(df)
+        )
         return df
     

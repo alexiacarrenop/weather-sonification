@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import numpy as np
 
@@ -8,11 +9,13 @@ WeatherCleaner
 '''
 
 class WeatherCleaner: 
+    logger = logging.getLogger(__name__)
 
     def __init__(self, dataframe):
         self.dataframe = dataframe
-
+        
     def clean(self):
+        self.logger.info("Starting weather data cleaning")
         df = self.dataframe
         
         # df.index = pd.to_datetime(df.index, utc=True).tz_convert("Europe/London").tz_localize(None)
@@ -34,7 +37,7 @@ class WeatherCleaner:
         # If gap is bigger than 6 hours = gap is too large to interpolate. Drop rows with missing data instead.
         before = len(df)
         df = df.dropna(subset=["temperature", "wind", "humidity"])
-        print(f"Dropped {before - len(df)} rows with unfillable gaps")
+        self.logger.info("Dropped %d rows with unfillable gaps", before - len(df))
 
         # Check for strange values. Anything outside these ranges is unusual for a UK coastal city and almost certainly a reporting error, not the actual weather.
         checks = {"temperature": (-15, 40),
@@ -48,7 +51,11 @@ class WeatherCleaner:
             n_bad = mask.sum()
 
             if n_bad:
-                print(f"{col}: {n_bad} out-of-range values found, flagging as NaN")
+                self.logger.warning(
+                    "%s: %d out-of-range values found, flagging as NaN",
+                    col,
+                    n_bad
+                )
                 df.loc[mask, col] = np.nan
 
         # Interpolate values we just flagged as errors
@@ -58,4 +65,5 @@ class WeatherCleaner:
         # Final tidy-up
         df = df.reset_index().rename(columns={"time": "datetime"}) # turn time back into a column (i made it an index at the start) and rename it to 'datetime'
 
+        self.logger.info("Weather data cleaning complete: %d records remaining", len(df))
         return df

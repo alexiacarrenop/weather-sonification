@@ -1,4 +1,5 @@
 import sys
+import logging
 import pandas as pd
 import numpy as np
 from datetime import datetime 
@@ -8,6 +9,11 @@ from weather_mapping import WeatherMapper
 from sonification import SonificationEngine
 
 def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(levelname)s - %(message)s"
+    )
+    
     fetcher = WeatherFetcher(
         station_id="03245",
         start=datetime(2025, 9, 29),

@@ -1,3 +1,4 @@
+import logging
 from .config import (
     BPM,
     ROOT,
@@ -10,6 +11,7 @@ from mido import MidiFile, MidiTrack, Message, MetaMessage, bpm2tempo
 
 # Takes mapped weather data and turns it into MIDI composition
 class SonificationEngine:
+    logger = logging.getLogger(__name__)
 
     def __init__(self, dataframe):
         self.dataframe = dataframe
@@ -51,6 +53,7 @@ class SonificationEngine:
 
     # Main function that creates the MIDI
     def generate(self):
+        self.logger.info("Starting MIDI generation")
 
         df = self.dataframe
 
@@ -62,9 +65,14 @@ class SonificationEngine:
         missing_cols = [col for col in required_cols if col not in df.columns]
 
         if missing_cols:
+            self.logger.error(
+                "Missing required columns: %s",
+                ", ".join(missing_cols)
+            )
             raise ValueError(f"Missing required columns: {', '.join(missing_cols)}")
 
         if df.empty:
+            self.logger.error("Cannot generate MIDI from an empty dataframe")
             raise ValueError("Cannot generate MIDI from an empty dataframe")
     
                 # ----------------------------------------------------------------------------
@@ -78,6 +86,7 @@ class SonificationEngine:
                 # ----------------------------------------------------------------------------
         mid = MidiFile(ticks_per_beat=TICKS_PER_BEAT)
 
+        self.logger.info("Creating MIDI tracks for temperature, humidity, wind, pressure and rain")
                 # Temperature (piano) 
         temperature_track = MidiTrack()
         mid.tracks.append(temperature_track)
@@ -167,5 +176,9 @@ class SonificationEngine:
                 off_time = note_dur if i < hits - 1 else note_dur + leftover
                 rain_track.append(Message("note_off", channel=4, note=RAIN_NOTE, velocity=0, time=off_time))
 
+        self.logger.info(
+            "MIDI generation complete: %d musical events processed",
+            len(df)
+        )
         return mid
 
