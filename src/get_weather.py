@@ -17,13 +17,20 @@ class WeatherFetcher:
     def fetch(self):
         station = ms.Station(id=self.station_id)
 
-        data = ms.hourly(
-            station,
-            self.start,
-            self.end,
-            timezone="Europe/London"
-        )
+        try:
+            data = ms.hourly(
+                station,
+                self.start,
+                self.end,
+                timezone="Europe/London"
+            ).fetch()
+        except Exception as e:
+            raise RuntimeError(f"Failed to retrieve weather data from Meteostat: {e}")
 
-        return data.fetch()
+        if data.empty:
+            raise ValueError("Meteostat returned no weather data for the requested period.")
 
-     #   df.to_csv("ncl_weather.csv")
+        return data
+        
+        
+        
