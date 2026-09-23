@@ -4,6 +4,10 @@ A Python project that transforms hourly weather data from Newcastle into a music
 
 The project downloads around nine months of weather observations, cleans and validates the data, maps weather variables to musical properties, compresses the data into approximately five minutes, and generates a multi-track MIDI file.
 
+## Audio Demo
+
+[Listen to a short sample of the generated composition](demo/sonification_demo.mp3)
+
 ## Architecture
 
 The project follows a modular data-to-music pipeline:
