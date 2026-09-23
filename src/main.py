@@ -3,10 +3,10 @@ import logging
 import pandas as pd
 import numpy as np
 from datetime import datetime 
-from get_weather import WeatherFetcher
-from clean_weather import WeatherCleaner
-from weather_mapping import WeatherMapper
-from sonification import SonificationEngine
+from .get_weather import WeatherFetcher
+from .clean_weather import WeatherCleaner
+from .weather_mapping import WeatherMapper
+from .sonification import SonificationEngine
 
 def main():
     logging.basicConfig(
