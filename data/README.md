@@ -63,6 +63,36 @@ weather_sonification/
 ├── .gitignore
 └── requirements.txt
 ```
+## Architecture
+
+The project is organised as a pipeline where each stage has a specific responsibility:
+
+```text
+                 ┌─────────────────┐
+                 │    Meteostat    │
+                 └────────┬────────┘
+                          ↓
+                 ┌─────────────────┐
+                 │ WeatherFetcher  │
+                 └────────┬────────┘
+                          ↓
+                 ┌─────────────────┐
+                 │ WeatherCleaner  │
+                 └────────┬────────┘
+                          ↓
+                 ┌─────────────────┐
+                 │ WeatherMapper   │
+                 └────────┬────────┘
+                          ↓
+                 ┌─────────────────┐
+                 │ Sonification    │
+                 │    Engine       │
+                 └────────┬────────┘
+                          ↓
+                 ┌─────────────────┐
+                 │    MIDI file    │
+                 └─────────────────┘
+```
 
 ### `main.py`
 
