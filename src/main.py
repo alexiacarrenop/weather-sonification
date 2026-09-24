@@ -28,7 +28,10 @@ def main():
     mapper = WeatherMapper(cleaned_df)
     mapped_df = mapper.map()
 
-    engine = SonificationEngine(mapped_df)
+    # Short test version
+    test_df = mapped_df.head(300)
+
+    engine = SonificationEngine(test_df)
     midi = engine.generate()
 
     midi.save("newcastle_weather.mid")

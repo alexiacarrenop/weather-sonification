@@ -24,17 +24,17 @@ class SonificationEngine:
     #                  blends into the next note.
     # ----------------------------------------------------------------------------
     TEMPERATURE_BLOCK_ROWS = 4
-    TEMPERATURE_OVERLAP_ROWS = 2
+    TEMPERATURE_OVERLAP_ROWS = 0
  
     HUMIDITY_BLOCK_ROWS = 8
-    HUMIDITY_OVERLAP_ROWS = 4
+    HUMIDITY_OVERLAP_ROWS = 0
     HUMIDITY_CHORD_STEPS = (0, 2)       # scale steps above the root; was (0, 2, 4)
  
     WIND_BLOCK_ROWS = 3
-    WIND_OVERLAP_ROWS = 2
+    WIND_OVERLAP_ROWS = 0
  
     PRESSURE_BLOCK_ROWS = 8
-    PRESSURE_OVERLAP_ROWS = 4
+    PRESSURE_OVERLAP_ROWS = 0
  
     RAIN_KEEP_PROBABILITY = 0.5         # chance each raindrop is actually played
     RAIN_NOTE_TICKS = 120               # length of one drop
